@@ -1,0 +1,40 @@
+name: Deploy Production
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Target environment"
+        required: true
+        default: staging
+        type: choice
+        options: [staging, production]
+
+jobs:
+  deploy:
+    name: Deploy to ${{ inputs.environment || 'production' }}
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment || 'production' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure kubectl
+        uses: azure/k8s-set-context@v4
+        with:
+          method: kubeconfig
+          kubeconfig: ${{ secrets.KUBE_CONFIG }}
+
+      - name: Apply Kubernetes manifests
+        run: |
+          kubectl apply -k infrastructure/kubernetes/
+          kubectl -n sylvara rollout status deployment/website --timeout=300s
+
+      - name: Smoke test
+        run: |
+          for i in 1 2 3 4 5; do
+            if curl -fsS "${{ vars.HEALTHCHECK_URL || 'https://sylvara.com/api/health' }}"; then exit 0; fi
+            sleep 10
+          done
+          exit 1

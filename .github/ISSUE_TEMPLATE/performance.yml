@@ -1,0 +1,22 @@
+name: "⚡ Performance issue"
+description: Report slow pages, endpoints, or builds
+labels: [performance]
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: What is slow?
+    validations:
+      required: true
+  - type: textarea
+    id: measurements
+    attributes:
+      label: Measurements
+      placeholder: "Lighthouse scores, Web Vitals, traces, timings"
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      placeholder: "Device, network, region, deployment"

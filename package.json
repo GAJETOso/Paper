@@ -1,0 +1,43 @@
+{
+  "name": "sylvara-platform",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Sylvara Paper Group — enterprise digital platform for a global paper manufacturing company. From Forest to Future.",
+  "license": "Apache-2.0",
+  "author": "Sylvara Paper Group <engineering@sylvara.com>",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/GAJETOso/Paper.git"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=9.0.0"
+  },
+  "packageManager": "pnpm@10.33.0",
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "lint": "turbo run lint",
+    "test": "turbo run test",
+    "typecheck": "turbo run typecheck",
+    "format": "prettier --write \"**/*.{ts,tsx,md,json,yml,yaml,css}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,md,json,yml,yaml,css}\"",
+    "db:generate": "pnpm --filter @sylvara/database generate",
+    "db:migrate": "pnpm --filter @sylvara/database migrate",
+    "db:seed": "pnpm --filter @sylvara/database seed",
+    "prepare": "husky || true"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^19.5.0",
+    "@commitlint/config-conventional": "^19.5.0",
+    "husky": "^9.1.6",
+    "lint-staged": "^15.2.10",
+    "prettier": "^3.3.3",
+    "turbo": "^2.3.0",
+    "typescript": "^5.6.3"
+  },
+  "lint-staged": {
+    "*.{ts,tsx,js,jsx}": "prettier --write",
+    "*.{md,json,yml,yaml,css}": "prettier --write"
+  }
+}

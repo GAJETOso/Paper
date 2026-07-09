@@ -1,0 +1,22 @@
+name: "🔒 Security hardening (non-sensitive)"
+description: Suggest a security improvement. For VULNERABILITIES use private reporting — see SECURITY.md.
+labels: [security]
+body:
+  - type: checkboxes
+    id: confirm
+    attributes:
+      label: Confirmation
+      options:
+        - label: This is NOT an exploitable vulnerability (those must be reported privately per SECURITY.md)
+          required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: Describe the hardening opportunity
+    validations:
+      required: true
+  - type: textarea
+    id: references
+    attributes:
+      label: References
+      placeholder: "OWASP links, CIS benchmarks…"

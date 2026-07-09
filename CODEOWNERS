@@ -1,0 +1,14 @@
+# Default owners for everything in the repo
+* @GAJETOso
+
+# Platform areas
+/apps/website/            @GAJETOso
+/apps/admin/              @GAJETOso
+/apps/whatsapp-bot/       @GAJETOso
+/apps/telegram-bot/       @GAJETOso
+/packages/database/       @GAJETOso
+/packages/auth/           @GAJETOso
+/services/                @GAJETOso
+/infrastructure/          @GAJETOso
+/.github/                 @GAJETOso
+/docs/                    @GAJETOso

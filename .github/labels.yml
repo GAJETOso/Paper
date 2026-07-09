@@ -1,0 +1,52 @@
+# Synced label definitions (use with EndBug/label-sync or `gh label create`)
+- name: bug
+  color: d73a4a
+  description: Something isn't working
+- name: enhancement
+  color: a2eeef
+  description: Improvement to existing functionality
+- name: feature
+  color: 0e8a16
+  description: New functionality
+- name: documentation
+  color: 0075ca
+  description: Docs improvements or additions
+- name: good first issue
+  color: 7057ff
+  description: Good for newcomers
+- name: help wanted
+  color: 008672
+  description: Extra attention is needed
+- name: security
+  color: b60205
+  description: Security-related work
+- name: performance
+  color: fbca04
+  description: Speed, memory, Web Vitals
+- name: breaking change
+  color: e11d21
+  description: Requires a major version bump
+- name: duplicate
+  color: cfd3d7
+  description: Already reported elsewhere
+- name: invalid
+  color: e4e669
+  description: Not a valid issue
+- name: question
+  color: d876e3
+  description: Further information requested
+- name: urgent
+  color: ff0000
+  description: Needs immediate attention
+- name: dependencies
+  color: 0366d6
+  description: Dependency updates
+- name: ci
+  color: 2088ff
+  description: CI/CD pipelines
+- name: docker
+  color: 384d54
+  description: Container images
+- name: infrastructure
+  color: 5319e7
+  description: Terraform / Kubernetes / cloud

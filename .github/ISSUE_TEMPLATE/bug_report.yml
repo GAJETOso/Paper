@@ -1,0 +1,44 @@
+name: "🐛 Bug report"
+description: Something isn't working as expected
+labels: [bug]
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: Describe the bug
+      description: A clear description of what the bug is.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Go to '...'
+        2. Click on '...'
+        3. See error
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: dropdown
+    id: app
+    attributes:
+      label: Affected app/package
+      options: [website, admin, customer-portal, supplier-portal, distributor-portal, investor-portal, whatsapp-bot, telegram-bot, chatbot, packages, services, infrastructure, other]
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      placeholder: "OS, browser, Node version, deployment target"
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant logs
+      render: shell

@@ -1,0 +1,21 @@
+name: "📚 Documentation"
+description: Report missing, unclear, or incorrect documentation
+labels: [documentation]
+body:
+  - type: input
+    id: location
+    attributes:
+      label: Location
+      placeholder: "docs/deployment.md, README.md §Quick start…"
+    validations:
+      required: true
+  - type: textarea
+    id: issue
+    attributes:
+      label: What is wrong or missing?
+    validations:
+      required: true
+  - type: textarea
+    id: suggestion
+    attributes:
+      label: Suggested improvement
