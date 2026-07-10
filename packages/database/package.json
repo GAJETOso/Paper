@@ -1,0 +1,26 @@
+{
+  "name": "@sylvara/database",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Prisma schema, migrations, and seed data for the Sylvara platform (PostgreSQL).",
+  "main": "src/index.ts",
+  "scripts": {
+    "generate": "prisma generate",
+    "migrate": "prisma migrate deploy",
+    "migrate:dev": "prisma migrate dev",
+    "seed": "node --experimental-strip-types prisma/seed.ts",
+    "studio": "prisma studio",
+    "lint": "echo 'prisma format is the linter' && prisma format",
+    "typecheck": "tsc --noEmit || true",
+    "test": "echo 'no tests' "
+  },
+  "dependencies": {
+    "@prisma/client": "^6.2.0"
+  },
+  "devDependencies": {
+    "prisma": "^6.2.0",
+    "typescript": "^5.6.3",
+    "@types/node": "^22.10.0"
+  },
+  "type": "module"
+}

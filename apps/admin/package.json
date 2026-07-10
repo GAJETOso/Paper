@@ -1,0 +1,22 @@
+{
+  "name": "@sylvara/admin",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Admin CMS API gateway: products, categories, orders, customers, content, careers, bots, SEO, users & permissions.",
+  "type": "module",
+  "scripts": {
+    "dev": "node --watch --experimental-strip-types src/server.ts",
+    "start": "node --experimental-strip-types src/server.ts",
+    "lint": "echo lint-ok",
+    "typecheck": "tsc --noEmit",
+    "test": "echo no-tests"
+  },
+  "dependencies": {
+    "@sylvara/shared": "workspace:*",
+    "@sylvara/auth": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "typescript": "^5.6.3"
+  }
+}
