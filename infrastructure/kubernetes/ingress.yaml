@@ -1,0 +1,33 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: platform
+  namespace: sylvara
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/limit-rps: "50"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts: [sylvara.com, www.sylvara.com, api.sylvara.com]
+      secretName: sylvara-tls
+  rules:
+    - host: sylvara.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend: { service: { name: website, port: { number: 80 } } }
+    - host: api.sylvara.com
+      http:
+        paths:
+          - path: /webhooks/whatsapp
+            pathType: Prefix
+            backend: { service: { name: whatsapp-bot, port: { number: 80 } } }
+          - path: /api/v1/chat
+            pathType: Prefix
+            backend: { service: { name: chatbot, port: { number: 80 } } }
+          - path: /api/v1/sustainability
+            pathType: Prefix
+            backend: { service: { name: sustainability, port: { number: 80 } } }

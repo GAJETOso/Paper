@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: platform-config
+  namespace: sylvara
+data:
+  NODE_ENV: "production"
+  APP_URL: "https://sylvara.com"
+  CRM_URL: "http://crm:4400"
+  AI_DEFAULT_MODEL: "claude-sonnet-5"

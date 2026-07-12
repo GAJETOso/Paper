@@ -1,0 +1,99 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: whatsapp-bot
+  namespace: sylvara
+  labels: { app: whatsapp-bot }
+spec:
+  replicas: 2
+  selector:
+    matchLabels: { app: whatsapp-bot }
+  template:
+    metadata:
+      labels: { app: whatsapp-bot }
+    spec:
+      securityContext: { runAsNonRoot: true }
+      containers:
+        - name: whatsapp-bot
+          image: ghcr.io/gajetoso/paper/whatsapp-bot:latest
+          ports: [{ containerPort: 4100 }]
+          envFrom:
+            - configMapRef: { name: platform-config }
+            - secretRef: { name: platform-secrets }
+          resources:
+            requests: { cpu: 50m, memory: 128Mi }
+            limits: { cpu: 500m, memory: 256Mi }
+          readinessProbe:
+            httpGet: { path: /health, port: 4100 }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: whatsapp-bot
+  namespace: sylvara
+spec:
+  selector: { app: whatsapp-bot }
+  ports: [{ port: 80, targetPort: 4100 }]
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: telegram-bot
+  namespace: sylvara
+  labels: { app: telegram-bot }
+spec:
+  replicas: 1 # long-polling: exactly one consumer
+  strategy: { type: Recreate }
+  selector:
+    matchLabels: { app: telegram-bot }
+  template:
+    metadata:
+      labels: { app: telegram-bot }
+    spec:
+      securityContext: { runAsNonRoot: true }
+      containers:
+        - name: telegram-bot
+          image: ghcr.io/gajetoso/paper/telegram-bot:latest
+          envFrom:
+            - configMapRef: { name: platform-config }
+            - secretRef: { name: platform-secrets }
+          resources:
+            requests: { cpu: 50m, memory: 128Mi }
+            limits: { cpu: 500m, memory: 256Mi }
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: chatbot
+  namespace: sylvara
+  labels: { app: chatbot }
+spec:
+  replicas: 2
+  selector:
+    matchLabels: { app: chatbot }
+  template:
+    metadata:
+      labels: { app: chatbot }
+    spec:
+      securityContext: { runAsNonRoot: true }
+      containers:
+        - name: chatbot
+          image: ghcr.io/gajetoso/paper/chatbot:latest
+          ports: [{ containerPort: 4200 }]
+          envFrom:
+            - configMapRef: { name: platform-config }
+            - secretRef: { name: platform-secrets }
+          resources:
+            requests: { cpu: 50m, memory: 128Mi }
+            limits: { cpu: 500m, memory: 256Mi }
+          readinessProbe:
+            httpGet: { path: /health, port: 4200 }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: chatbot
+  namespace: sylvara
+spec:
+  selector: { app: chatbot }
+  ports: [{ port: 80, targetPort: 4200 }]

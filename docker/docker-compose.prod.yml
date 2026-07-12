@@ -1,0 +1,51 @@
+# Production-shaped compose (single-host deployments; Kubernetes preferred).
+name: sylvara
+
+services:
+  website:
+    image: ghcr.io/gajetoso/paper/website:latest
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: ${DATABASE_URL}
+      CRM_URL: http://crm:4400
+    depends_on: [crm]
+    deploy:
+      resources:
+        limits: { memory: 512M }
+
+  crm:
+    image: ghcr.io/gajetoso/paper/service-crm:latest
+    restart: unless-stopped
+    environment:
+      HUBSPOT_ACCESS_TOKEN: ${HUBSPOT_ACCESS_TOKEN}
+
+  whatsapp-bot:
+    image: ghcr.io/gajetoso/paper/whatsapp-bot:latest
+    restart: unless-stopped
+    ports:
+      - "4100:4100"
+    environment:
+      WHATSAPP_ACCESS_TOKEN: ${WHATSAPP_ACCESS_TOKEN}
+      WHATSAPP_PHONE_NUMBER_ID: ${WHATSAPP_PHONE_NUMBER_ID}
+      WHATSAPP_VERIFY_TOKEN: ${WHATSAPP_VERIFY_TOKEN}
+      WHATSAPP_APP_SECRET: ${WHATSAPP_APP_SECRET}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+
+  telegram-bot:
+    image: ghcr.io/gajetoso/paper/telegram-bot:latest
+    restart: unless-stopped
+    environment:
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+
+  chatbot:
+    image: ghcr.io/gajetoso/paper/chatbot:latest
+    restart: unless-stopped
+    ports:
+      - "4200:4200"
+    environment:
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+      APP_URL: https://sylvara.com
