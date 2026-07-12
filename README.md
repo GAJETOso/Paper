@@ -110,19 +110,19 @@ The website runs at **http://localhost:3000**.
 
 ## Engineering highlights
 
-| Area          | Implementation                                                       |
-| ------------- | -------------------------------------------------------------------- |
-| Architecture  | Clean Architecture + DDD-aligned monorepo (Turborepo)               |
-| Language      | TypeScript strict mode everywhere                                    |
-| Database      | PostgreSQL + Prisma (see `docs/database.md` for the ERD)             |
-| Auth          | JWT + rotating refresh tokens, RBAC, TOTP 2FA, audit logs            |
-| APIs          | REST + GraphQL, OpenAPI 3.1 spec, Postman collection                 |
-| CI/CD         | GitHub Actions: lint → typecheck → test → build → scan → deploy      |
-| Security      | CodeQL, secret scanning, dependency review, CSP, rate limiting       |
-| Observability | OpenTelemetry, Prometheus, Grafana, Sentry, health checks            |
-| Deployment    | Docker, Kubernetes (HPA, ingress), Terraform (AWS/Azure/GCP)         |
-| Quality       | ESLint, Prettier, Husky, lint-staged, Commitlint, EditorConfig       |
-| Testing       | Vitest (unit), Playwright (E2E), k6 (load), accessibility checks     |
+| Area          | Implementation                                                   |
+| ------------- | ---------------------------------------------------------------- |
+| Architecture  | Clean Architecture + DDD-aligned monorepo (Turborepo)            |
+| Language      | TypeScript strict mode everywhere                                |
+| Database      | PostgreSQL + Prisma (see `docs/database.md` for the ERD)         |
+| Auth          | JWT + rotating refresh tokens, RBAC, TOTP 2FA, audit logs        |
+| APIs          | REST + GraphQL, OpenAPI 3.1 spec, Postman collection             |
+| CI/CD         | GitHub Actions: lint → typecheck → test → build → scan → deploy  |
+| Security      | CodeQL, secret scanning, dependency review, CSP, rate limiting   |
+| Observability | OpenTelemetry, Prometheus, Grafana, Sentry, health checks        |
+| Deployment    | Docker, Kubernetes (HPA, ingress), Terraform (AWS/Azure/GCP)     |
+| Quality       | ESLint, Prettier, Husky, lint-staged, Commitlint, EditorConfig   |
+| Testing       | Vitest (unit), Playwright (E2E), k6 (load), accessibility checks |
 
 ## Documentation
 

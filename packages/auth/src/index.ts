@@ -14,8 +14,15 @@ export interface JwtPayload {
   exp: number;
 }
 
+/** Strips trailing `=` padding without an unbounded trailing quantifier (avoids ReDoS on adversarial input). */
+function stripPadding(s: string): string {
+  let end = s.length;
+  while (end > 0 && s[end - 1] === "=") end--;
+  return s.slice(0, end);
+}
+
 const b64url = (b: Buffer | string) =>
-  Buffer.from(b).toString("base64").replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+  stripPadding(Buffer.from(b).toString("base64").replace(/\+/g, "-").replace(/\//g, "_"));
 
 export function signJwt(
   payload: Omit<JwtPayload, "iat" | "exp">,
@@ -76,7 +83,7 @@ function base32Decode(input: string): Buffer {
   let bits = 0;
   let value = 0;
   const out: number[] = [];
-  for (const ch of input.replace(/=+$/, "").toUpperCase()) {
+  for (const ch of stripPadding(input).toUpperCase()) {
     const idx = alphabet.indexOf(ch);
     if (idx === -1) continue;
     value = (value << 5) | idx;

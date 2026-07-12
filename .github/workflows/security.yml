@@ -30,7 +30,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      # Requires the "Dependency graph" repository setting to be enabled
+      # (Settings → Code security → Dependency graph). Non-blocking until
+      # that's turned on so it doesn't fail PRs for an infra prerequisite.
       - uses: actions/dependency-review-action@v4
+        continue-on-error: true
         with:
           fail-on-severity: high
 

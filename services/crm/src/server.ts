@@ -68,13 +68,11 @@ const server = createServer(async (req, res) => {
       void mirrorToExternalCrm(lead);
       res.writeHead(201).end(JSON.stringify({ ok: true, id: lead.id }));
     } catch {
-      res
-        .writeHead(422)
-        .end(
-          JSON.stringify({
-            error: { code: "invalid_input", message: "name, email, message required" },
-          }),
-        );
+      res.writeHead(422).end(
+        JSON.stringify({
+          error: { code: "invalid_input", message: "name, email, message required" },
+        }),
+      );
     }
     return;
   }

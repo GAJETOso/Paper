@@ -17,9 +17,9 @@
 
 ## Response targets
 
-| Channel            | First response |
-| ------------------ | -------------- |
-| Security reports   | 2 business days |
-| Bug reports        | 3 business days |
-| Feature requests   | 7 business days |
-| Questions          | 7 business days |
+| Channel          | First response  |
+| ---------------- | --------------- |
+| Security reports | 2 business days |
+| Bug reports      | 3 business days |
+| Feature requests | 7 business days |
+| Questions        | 7 business days |

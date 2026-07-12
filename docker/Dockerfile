@@ -6,7 +6,7 @@
 FROM node:22-alpine AS deps
 RUN corepack enable
 WORKDIR /repo
-COPY pnpm-workspace.yaml package.json pnpm-lock.yaml ./
+COPY pnpm-workspace.yaml package.json pnpm-lock.yaml tsconfig.base.json ./
 COPY apps ./apps
 COPY packages ./packages
 COPY services ./services

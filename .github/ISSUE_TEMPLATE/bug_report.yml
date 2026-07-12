@@ -29,7 +29,22 @@ body:
     id: app
     attributes:
       label: Affected app/package
-      options: [website, admin, customer-portal, supplier-portal, distributor-portal, investor-portal, whatsapp-bot, telegram-bot, chatbot, packages, services, infrastructure, other]
+      options:
+        [
+          website,
+          admin,
+          customer-portal,
+          supplier-portal,
+          distributor-portal,
+          investor-portal,
+          whatsapp-bot,
+          telegram-bot,
+          chatbot,
+          packages,
+          services,
+          infrastructure,
+          other,
+        ]
     validations:
       required: true
   - type: textarea
