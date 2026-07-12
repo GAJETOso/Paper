@@ -50,7 +50,7 @@ module "vpc" {
 
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
-  version = "~> 20.24"
+  version = "~> 21.24"
 
   cluster_name    = "sylvara-${var.environment}"
   cluster_version = "1.31"
