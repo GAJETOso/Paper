@@ -32,7 +32,7 @@ jobs:
           - app: chatbot
             dockerfile: docker/Dockerfile.service
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: docker/setup-buildx-action@v4
       - name: Log in to registry
         if: github.event_name != 'pull_request'
