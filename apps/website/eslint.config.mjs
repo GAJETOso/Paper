@@ -9,6 +9,9 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 // export yet, so wrap it with FlatCompat per Next's own migration guidance.
 const compat = new FlatCompat({ baseDirectory: __dirname });
 
-const eslintConfig = [...compat.extends("next/core-web-vitals")];
+const eslintConfig = [
+  { ignores: [".next/**", "node_modules/**", "coverage/**"] },
+  ...compat.extends("next/core-web-vitals"),
+];
 
 export default eslintConfig;
