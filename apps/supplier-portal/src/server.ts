@@ -19,10 +19,11 @@ const server = createServer((req, res) => {
     return;
   }
 
-  // Below, payload.role is read only after verifyJwt() validates an HMAC-SHA256
+  // payload.role below is read only after verifyJwt() validates an HMAC-SHA256
   // signature (timing-safe compare) against JWT_SECRET, a value the client never has;
   // a request cannot forge a valid signature, so this cannot be bypassed by a client.
-  // codeql[js/user-controlled-bypass]
+  // (js/user-controlled-bypass is excluded repo-wide for this reason — see
+  // .github/codeql/codeql-config.yml.)
   if (req.url === "/api/v1/me") {
     const token = (req.headers.authorization ?? "").replace(/^Bearer /, "");
     const payload = JWT_SECRET ? verifyJwt(token, JWT_SECRET) : null;
