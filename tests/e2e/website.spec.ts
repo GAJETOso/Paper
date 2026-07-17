@@ -5,7 +5,14 @@ test.describe("Home", () => {
     await page.goto("/");
     await expect(page).toHaveTitle(/Sylvara/);
     await expect(page.getByRole("heading", { level: 1 })).toContainText(/From forest/i);
-    await expect(page.getByRole("navigation", { name: "Primary" })).toBeVisible();
+    // The desktop nav landmark is hidden (display:none, so absent from the
+    // a11y tree) below the lg breakpoint in favor of a hamburger toggle.
+    const viewport = page.viewportSize();
+    if (viewport && viewport.width < 1024) {
+      await expect(page.getByRole("button", { name: /toggle menu/i })).toBeVisible();
+    } else {
+      await expect(page.getByRole("navigation", { name: "Primary" })).toBeVisible();
+    }
   });
 
   test("skip link targets main content", async ({ page }) => {
@@ -25,7 +32,7 @@ test.describe("Product catalog", () => {
   test("product page shows specs and quote actions", async ({ page }) => {
     await page.goto("/products/printing-papers/copy-paper");
     await expect(page.getByRole("heading", { level: 1 })).toContainText("Copy Paper");
-    await expect(page.getByText("Specifications")).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Specifications" })).toBeVisible();
     await expect(page.getByRole("link", { name: /request quote online/i })).toBeVisible();
   });
 
@@ -39,7 +46,7 @@ test.describe("Sustainability", () => {
   test("dashboard shows headline metrics", async ({ page }) => {
     await page.goto("/sustainability");
     await expect(page.getByText("Net zero target")).toBeVisible();
-    await expect(page.getByText("Recycled fiber input")).toBeVisible();
+    await expect(page.getByText("Recycled fiber input", { exact: true })).toBeVisible();
   });
 });
 

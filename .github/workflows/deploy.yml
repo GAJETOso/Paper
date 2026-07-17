@@ -18,7 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment || 'production' }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Configure kubectl
         uses: azure/k8s-set-context@v4

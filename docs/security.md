@@ -22,6 +22,14 @@
 - CodeQL SAST (security-extended), gitleaks secret scanning, dependency
   review failing on high severity, weekly scheduled scans, Dependabot
 - Non-root containers, dropped capabilities, seccomp RuntimeDefault
+- `js/user-controlled-bypass` is excluded via `.github/codeql/codeql-config.yml`.
+  It fires on the portal scaffolds' RBAC checks (`apps/*/src/server.ts`)
+  because CodeQL's sanitizer models recognize well-known JWT libraries'
+  `.verify()` calls but not `packages/auth`'s hand-rolled HS256 verifier —
+  `payload.role` is only read after a timing-safe HMAC-SHA256 signature
+  check against a server-only secret, so it is not actually attacker
+  bypassable. Same false-positive class tracked upstream for the analogous
+  C# query: https://github.com/github/codeql/issues/13826
 
 ## Data protection & compliance
 
