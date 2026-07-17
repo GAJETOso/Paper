@@ -19,10 +19,10 @@ const server = createServer((req, res) => {
     return;
   }
 
-  // codeql[js/user-controlled-bypass]: the auth decision below reads payload.role only
-  // after verifyJwt() validates an HMAC-SHA256 signature (timing-safe compare) against
-  // JWT_SECRET, a value the client never has. A request cannot forge a valid signature,
-  // so routing on req.url here does not let a client bypass the RBAC check.
+  // Below, payload.role is read only after verifyJwt() validates an HMAC-SHA256
+  // signature (timing-safe compare) against JWT_SECRET, a value the client never has;
+  // a request cannot forge a valid signature, so this cannot be bypassed by a client.
+  // codeql[js/user-controlled-bypass]
   if (req.url === "/api/v1/me") {
     const token = (req.headers.authorization ?? "").replace(/^Bearer /, "");
     const payload = JWT_SECRET ? verifyJwt(token, JWT_SECRET) : null;
