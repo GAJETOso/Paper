@@ -18,15 +18,15 @@ per-app instructions.
 
 ## Branch strategy (GitFlow)
 
-| Branch       | Purpose                                    |
-| ------------ | ------------------------------------------ |
-| `main`       | Production. Protected; release tags only.  |
-| `develop`    | Integration branch for the next release.   |
-| `staging`    | Pre-production verification.               |
-| `feature/*`  | New features, branched from `develop`.     |
-| `bugfix/*`   | Non-urgent fixes, branched from `develop`. |
-| `hotfix/*`   | Urgent production fixes, from `main`.      |
-| `release/*`  | Release stabilization branches.            |
+| Branch      | Purpose                                    |
+| ----------- | ------------------------------------------ |
+| `main`      | Production. Protected; release tags only.  |
+| `develop`   | Integration branch for the next release.   |
+| `staging`   | Pre-production verification.               |
+| `feature/*` | New features, branched from `develop`.     |
+| `bugfix/*`  | Non-urgent fixes, branched from `develop`. |
+| `hotfix/*`  | Urgent production fixes, from `main`.      |
+| `release/*` | Release stabilization branches.            |
 
 ## Commit messages — Conventional Commits
 

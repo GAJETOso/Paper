@@ -1,0 +1,220 @@
+openapi: 3.1.0
+info:
+  title: Sylvara Platform API
+  version: 1.0.0
+  description: |
+    Public and portal APIs for the Sylvara Paper Group platform.
+    Errors use a standard envelope: `{ "error": { "code", "message" } }`.
+  contact:
+    email: engineering@sylvara.com
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0
+servers:
+  - url: https://api.sylvara.com
+    description: Production
+  - url: http://localhost:3000
+    description: Local website (contact/health routes)
+tags:
+  - name: Health
+  - name: Leads
+  - name: Chat
+  - name: Sustainability
+  - name: Portal
+paths:
+  /api/health:
+    get:
+      tags: [Health]
+      summary: Liveness probe
+      responses:
+        "200":
+          description: Service healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status: { type: string, enum: [ok] }
+                  service: { type: string }
+                  timestamp: { type: string, format: date-time }
+  /api/contact:
+    post:
+      tags: [Leads]
+      summary: Website contact / quotation intake
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LeadInput"
+      responses:
+        "200": { description: Accepted }
+        "422":
+          description: Validation error
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+  /api/v1/leads:
+    post:
+      tags: [Leads]
+      summary: Create a CRM lead (internal services and bots)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/LeadInput" }
+      responses:
+        "201":
+          description: Lead created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok: { type: boolean }
+                  id: { type: string }
+        "422":
+          description: Validation error
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+    get:
+      tags: [Leads]
+      summary: List recent leads
+      security: [{ bearerAuth: [] }]
+      responses:
+        "200":
+          description: Paginated leads
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items: { $ref: "#/components/schemas/Lead" }
+                  total: { type: integer }
+                  page: { type: integer }
+                  pageSize: { type: integer }
+  /api/v1/chat:
+    post:
+      tags: [Chat]
+      summary: AI assistant chat turn
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [messages]
+              properties:
+                messages:
+                  type: array
+                  maxItems: 20
+                  items:
+                    type: object
+                    required: [role, content]
+                    properties:
+                      role: { type: string, enum: [user, assistant] }
+                      content: { type: string, maxLength: 4000 }
+      responses:
+        "200":
+          description: Assistant reply
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  reply: { type: string }
+                  handover:
+                    type: boolean
+                    description: True when a human agent should take over
+        "422":
+          description: Invalid input
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+        "429":
+          description: Rate limited (20 req/min/IP)
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+  /api/v1/sustainability/snapshot:
+    get:
+      tags: [Sustainability]
+      summary: Public live ESG snapshot (cached 60s)
+      responses:
+        "200":
+          description: Current verified metrics
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  renewableEnergyPct: { type: number }
+                  recycledFiberPct: { type: number }
+                  waterReturnedCleanPct: { type: number }
+                  wasteDiversionPct: { type: number }
+                  co2ReductionVs2019Pct: { type: number }
+                  treesPlantedTotal: { type: integer }
+                  asOf: { type: string, format: date-time }
+  /api/v1/me:
+    get:
+      tags: [Portal]
+      summary: Current authenticated principal (portal services)
+      security: [{ bearerAuth: [] }]
+      responses:
+        "200":
+          description: Token subject and role
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  sub: { type: string }
+                  role:
+                    type: string
+                    enum: [ADMIN, STAFF, CUSTOMER, DISTRIBUTOR, SUPPLIER, INVESTOR]
+        "401":
+          description: Missing/invalid/insufficient token
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: 15-minute HS256 access token; refresh via rotating refresh tokens.
+  schemas:
+    Error:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            code: { type: string }
+            message: { type: string }
+    LeadInput:
+      type: object
+      required: [name, email, message]
+      properties:
+        name: { type: string }
+        email: { type: string, format: email }
+        phone: { type: string }
+        company: { type: string }
+        topic: { type: string }
+        category: { type: string }
+        message: { type: string, maxLength: 10000 }
+        source:
+          type: string
+          enum: [website, whatsapp, telegram, event, api]
+    Lead:
+      allOf:
+        - $ref: "#/components/schemas/LeadInput"
+        - type: object
+          properties:
+            id: { type: string }
+            status: { type: string }
+            createdAt: { type: string, format: date-time }

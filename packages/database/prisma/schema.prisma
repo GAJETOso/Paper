@@ -1,0 +1,507 @@
+// ============================================================================
+// Sylvara Platform — Database Schema (PostgreSQL)
+//
+// Domains: Identity & Access · Catalog · Commerce · Manufacturing ·
+//          Inventory · CRM · Sustainability · Content · Portals · Messaging
+// ERD: docs/database.md
+// ============================================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ── Identity & Access ────────────────────────────────────────────────────────
+
+enum UserRole {
+  ADMIN
+  STAFF
+  CUSTOMER
+  DISTRIBUTOR
+  SUPPLIER
+  INVESTOR
+}
+
+model User {
+  id             String        @id @default(cuid())
+  email          String        @unique
+  passwordHash   String?
+  name           String
+  role           UserRole      @default(CUSTOMER)
+  locale         String        @default("en")
+  totpSecret     String? // 2FA (TOTP)
+  totpEnabled    Boolean       @default(false)
+  emailVerified  DateTime?
+  organizationId String?
+  organization   Organization? @relation(fields: [organizationId], references: [id])
+  sessions       Session[]
+  auditLogs      AuditLog[]
+  orders         Order[]
+  quotations     Quotation[]
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  @@index([organizationId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  refreshToken String   @unique // rotated on every use
+  userAgent    String?
+  ip           String?
+  expiresAt    DateTime
+  createdAt    DateTime @default(now())
+
+  @@index([userId])
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id])
+  action    String // e.g. "order.create", "user.login", "price.update"
+  entity    String?
+  entityId  String?
+  metadata  Json?
+  ip        String?
+  createdAt DateTime @default(now())
+
+  @@index([userId, createdAt])
+  @@index([entity, entityId])
+}
+
+enum OrgType {
+  CUSTOMER
+  DISTRIBUTOR
+  SUPPLIER
+  GOVERNMENT
+  NGO
+}
+
+model Organization {
+  id           String              @id @default(cuid())
+  name         String
+  type         OrgType
+  country      String
+  taxId        String?
+  creditLimit  Decimal?            @db.Decimal(14, 2)
+  paymentTerms Int                 @default(30) // days
+  users        User[]
+  orders       Order[]
+  quotations   Quotation[]
+  scorecards   SupplierScorecard[]
+  createdAt    DateTime            @default(now())
+  updatedAt    DateTime            @updatedAt
+
+  @@index([type, country])
+}
+
+// ── Catalog ──────────────────────────────────────────────────────────────────
+
+model Category {
+  id          String    @id @default(cuid())
+  slug        String    @unique
+  name        String
+  tagline     String
+  description String
+  icon        String
+  sortOrder   Int       @default(0)
+  products    Product[]
+}
+
+model Product {
+  id           String           @id @default(cuid())
+  slug         String
+  name         String
+  blurb        String
+  specs        String[]
+  applications String[]
+  eco          String
+  categoryId   String
+  category     Category         @relation(fields: [categoryId], references: [id])
+  variants     ProductVariant[]
+  published    Boolean          @default(true)
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+
+  @@unique([categoryId, slug])
+  @@index([published])
+}
+
+model ProductVariant {
+  id             String          @id @default(cuid())
+  productId      String
+  product        Product         @relation(fields: [productId], references: [id], onDelete: Cascade)
+  sku            String          @unique
+  name           String // e.g. "A4 80gsm 500-sheet ream"
+  gsm            Int?
+  dimensions     String? // "210x297mm"
+  unit           String          @default("unit") // unit, ream, tonne, roll, carton
+  basePrice      Decimal         @db.Decimal(12, 4)
+  currency       String          @default("USD")
+  moq            Int             @default(1)
+  stockItems     StockItem[]
+  orderItems     OrderItem[]
+  quotationItems QuotationItem[]
+
+  @@index([productId])
+}
+
+// ── Commerce ────────────────────────────────────────────────────────────────
+
+enum QuotationStatus {
+  DRAFT
+  SENT
+  ACCEPTED
+  EXPIRED
+  REJECTED
+}
+
+model Quotation {
+  id             String          @id @default(cuid())
+  number         String          @unique // Q-2026-000123
+  userId         String?
+  user           User?           @relation(fields: [userId], references: [id])
+  organizationId String?
+  organization   Organization?   @relation(fields: [organizationId], references: [id])
+  channel        String          @default("web") // web, whatsapp, telegram, sales
+  status         QuotationStatus @default(DRAFT)
+  currency       String          @default("USD")
+  total          Decimal         @db.Decimal(14, 2)
+  validUntil     DateTime
+  items          QuotationItem[]
+  order          Order?
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+
+  @@index([status, createdAt])
+}
+
+model QuotationItem {
+  id          String         @id @default(cuid())
+  quotationId String
+  quotation   Quotation      @relation(fields: [quotationId], references: [id], onDelete: Cascade)
+  variantId   String
+  variant     ProductVariant @relation(fields: [variantId], references: [id])
+  quantity    Int
+  unitPrice   Decimal        @db.Decimal(12, 4)
+
+  @@index([quotationId])
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  IN_PRODUCTION
+  READY
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+
+model Order {
+  id              String        @id @default(cuid())
+  number          String        @unique // SO-2026-000456
+  userId          String?
+  user            User?         @relation(fields: [userId], references: [id])
+  organizationId  String?
+  organization    Organization? @relation(fields: [organizationId], references: [id])
+  quotationId     String?       @unique
+  quotation       Quotation?    @relation(fields: [quotationId], references: [id])
+  status          OrderStatus   @default(PENDING)
+  currency        String        @default("USD")
+  total           Decimal       @db.Decimal(14, 2)
+  shippingAddress Json
+  incoterms       String? // FOB, CIF, DDP…
+  items           OrderItem[]
+  shipments       Shipment[]
+  payments        Payment[]
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  @@index([status, createdAt])
+  @@index([organizationId])
+}
+
+model OrderItem {
+  id        String         @id @default(cuid())
+  orderId   String
+  order     Order          @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  variantId String
+  variant   ProductVariant @relation(fields: [variantId], references: [id])
+  quantity  Int
+  unitPrice Decimal        @db.Decimal(12, 4)
+
+  @@index([orderId])
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
+}
+
+model Payment {
+  id        String        @id @default(cuid())
+  orderId   String
+  order     Order         @relation(fields: [orderId], references: [id])
+  provider  String // stripe, paystack, flutterwave, wire
+  reference String        @unique
+  amount    Decimal       @db.Decimal(14, 2)
+  currency  String
+  status    PaymentStatus @default(PENDING)
+  createdAt DateTime      @default(now())
+
+  @@index([orderId])
+}
+
+model Shipment {
+  id             String    @id @default(cuid())
+  orderId        String
+  order          Order     @relation(fields: [orderId], references: [id])
+  carrier        String
+  trackingNumber String?
+  co2Kg          Decimal?  @db.Decimal(12, 2) // carbon-tracked shipping
+  shippedAt      DateTime?
+  deliveredAt    DateTime?
+
+  @@index([orderId])
+}
+
+// ── Manufacturing & Inventory ───────────────────────────────────────────────
+
+model Mill {
+  id          String                 @id @default(cuid())
+  name        String
+  region      String
+  country     String
+  city        String
+  capacityTpy Int // tonnes per year
+  focus       String
+  machines    Machine[]
+  warehouses  Warehouse[]
+  metrics     SustainabilityMetric[]
+}
+
+enum MachineStatus {
+  RUNNING
+  IDLE
+  MAINTENANCE
+  FAULT
+}
+
+model Machine {
+  id        String             @id @default(cuid())
+  millId    String
+  mill      Mill               @relation(fields: [millId], references: [id])
+  name      String // "PM7", "Corrugator 2", "Cup Former 11"
+  type      String
+  status    MachineStatus      @default(RUNNING)
+  widthMm   Int?
+  speedMpm  Int?
+  telemetry MachineTelemetry[]
+
+  @@index([millId])
+}
+
+/// IoT time-series sample (hypertable candidate under TimescaleDB).
+model MachineTelemetry {
+  id         BigInt   @id @default(autoincrement())
+  machineId  String
+  machine    Machine  @relation(fields: [machineId], references: [id])
+  recordedAt DateTime @default(now())
+  metric     String // energy_kwh, speed_mpm, vibration_rms, moisture_pct
+  value      Float
+
+  @@index([machineId, metric, recordedAt])
+}
+
+model Warehouse {
+  id      String      @id @default(cuid())
+  millId  String?
+  mill    Mill?       @relation(fields: [millId], references: [id])
+  name    String
+  country String
+  stock   StockItem[]
+}
+
+model StockItem {
+  id          String         @id @default(cuid())
+  warehouseId String
+  warehouse   Warehouse      @relation(fields: [warehouseId], references: [id])
+  variantId   String
+  variant     ProductVariant @relation(fields: [variantId], references: [id])
+  quantity    Int
+  reserved    Int            @default(0)
+  updatedAt   DateTime       @updatedAt
+
+  @@unique([warehouseId, variantId])
+}
+
+// ── CRM ─────────────────────────────────────────────────────────────────────
+
+enum LeadStatus {
+  NEW
+  CONTACTED
+  QUALIFIED
+  QUOTED
+  WON
+  LOST
+}
+
+model Lead {
+  id        String     @id @default(cuid())
+  name      String
+  email     String
+  phone     String?
+  company   String?
+  topic     String     @default("quotation")
+  category  String?
+  message   String
+  source    String     @default("website") // website, whatsapp, telegram, event
+  status    LeadStatus @default(NEW)
+  ownerId   String? // assigned sales user
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  @@index([status, createdAt])
+  @@index([email])
+}
+
+// ── Sustainability ──────────────────────────────────────────────────────────
+
+model SustainabilityMetric {
+  id          String   @id @default(cuid())
+  millId      String?
+  mill        Mill?    @relation(fields: [millId], references: [id])
+  metric      String // co2_scope1_t, water_m3_per_t, renewable_pct, recycled_fiber_pct…
+  value       Float
+  unit        String
+  periodStart DateTime
+  periodEnd   DateTime
+  verified    Boolean  @default(false) // third-party assured
+  createdAt   DateTime @default(now())
+
+  @@index([metric, periodStart])
+  @@index([millId])
+}
+
+model TreePlanting {
+  id         String   @id @default(cuid())
+  country    String
+  region     String?
+  trees      Int
+  program    String // nursery, restoration, agroforestry, community
+  plantedAt  DateTime
+  verifiedBy String?
+
+  @@index([plantedAt])
+}
+
+model SupplierScorecard {
+  id             String       @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  year           Int
+  quality        Int // 0–100 per dimension
+  environment    Int
+  labor          Int
+  innovation     Int
+  cost           Int
+  notes          String?
+
+  @@unique([organizationId, year])
+}
+
+// ── Content (CMS) ───────────────────────────────────────────────────────────
+
+enum ContentStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+model Article {
+  id          String        @id @default(cuid())
+  slug        String        @unique
+  title       String
+  category    String // press-release, blog, innovation, sustainability, investor
+  excerpt     String
+  body        String
+  status      ContentStatus @default(DRAFT)
+  authorId    String?
+  publishedAt DateTime?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@index([status, publishedAt])
+}
+
+model JobPosting {
+  id           String           @id @default(cuid())
+  title        String
+  location     String
+  team         String
+  body         String
+  status       ContentStatus    @default(PUBLISHED)
+  applications JobApplication[]
+  createdAt    DateTime         @default(now())
+}
+
+model JobApplication {
+  id        String     @id @default(cuid())
+  jobId     String
+  job       JobPosting @relation(fields: [jobId], references: [id])
+  name      String
+  email     String
+  cvUrl     String?
+  coverNote String?
+  createdAt DateTime   @default(now())
+
+  @@index([jobId])
+}
+
+// ── Messaging (WhatsApp / Telegram bots) ────────────────────────────────────
+
+enum Channel {
+  WHATSAPP
+  TELEGRAM
+  WEBCHAT
+}
+
+model Conversation {
+  id         String    @id @default(cuid())
+  channel    Channel
+  externalId String // wa phone number / tg chat id
+  locale     String    @default("en")
+  handedOver Boolean   @default(false) // escalated to human agent
+  messages   Message[]
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  @@unique([channel, externalId])
+}
+
+enum MessageDirection {
+  INBOUND
+  OUTBOUND
+}
+
+model Message {
+  id             String           @id @default(cuid())
+  conversationId String
+  conversation   Conversation     @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  direction      MessageDirection
+  body           String
+  mediaUrl       String?
+  createdAt      DateTime         @default(now())
+
+  @@index([conversationId, createdAt])
+}

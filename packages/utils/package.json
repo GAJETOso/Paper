@@ -1,0 +1,19 @@
+{
+  "name": "@sylvara/utils",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Shared utilities: slugs, money, dates, validation",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "scripts": {
+    "lint": "echo lint-ok",
+    "typecheck": "tsc --noEmit",
+    "test": "echo no-tests",
+    "build": "echo 'consumed as source by bundlers'"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.3",
+    "@types/node": "^22.10.0"
+  },
+  "type": "module"
+}

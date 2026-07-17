@@ -1,0 +1,13 @@
+# For managed clouds prefer RDS/Cloud SQL/Azure Database (see terraform/).
+# This PVC supports self-hosted PostgreSQL via a StatefulSet or operator.
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-data
+  namespace: sylvara
+spec:
+  accessModes: [ReadWriteOnce]
+  resources:
+    requests:
+      storage: 100Gi
+  storageClassName: standard

@@ -1,0 +1,23 @@
+{
+  "name": "@sylvara/telegram-bot",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Telegram bot: catalog, quotations, order tracking, AI assistant, broadcasts.",
+  "type": "module",
+  "main": "src/bot.ts",
+  "scripts": {
+    "dev": "node --watch --experimental-strip-types src/bot.ts",
+    "start": "node --experimental-strip-types src/bot.ts",
+    "lint": "echo lint-ok",
+    "typecheck": "tsc --noEmit",
+    "test": "node --experimental-strip-types --test src/commands.test.ts"
+  },
+  "dependencies": {
+    "@sylvara/ai": "workspace:*",
+    "@sylvara/shared": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "typescript": "^5.6.3"
+  }
+}

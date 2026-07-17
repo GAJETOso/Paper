@@ -1,0 +1,18 @@
+name: "Sylvara CodeQL configuration"
+
+queries:
+  - uses: security-extended
+
+# js/user-controlled-bypass is excluded here (not per-line) after three
+# attempts at inline `codeql[...]` suppression comments did not take effect
+# across pushes. The alert fires on packages/auth's hand-rolled HS256 JWT
+# verifier: CodeQL's default sanitizer models recognize well-known JWT
+# libraries' `.verify()` calls but not custom crypto, so payload.role reads
+# after verifyJwt() are still treated as attacker-controlled even though
+# verifyJwt() performs a real, timing-safe HMAC-SHA256 signature check
+# against a server-only secret (see packages/auth/src/index.ts). The same
+# false-positive class is documented upstream for the analogous C# query:
+# https://github.com/github/codeql/issues/13826
+query-filters:
+  - exclude:
+      id: js/user-controlled-bypass

@@ -1,0 +1,92 @@
+{
+  "info": {
+    "name": "Sylvara Platform API",
+    "description": "REST endpoints for the Sylvara Paper Group platform. Set {{baseUrl}} and {{token}} variables.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3000" },
+    { "key": "crmUrl", "value": "http://localhost:4400" },
+    { "key": "chatUrl", "value": "http://localhost:4200" },
+    { "key": "sustainabilityUrl", "value": "http://localhost:4430" },
+    { "key": "token", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "Website health",
+          "request": { "method": "GET", "url": "{{baseUrl}}/api/health" }
+        },
+        { "name": "CRM health", "request": { "method": "GET", "url": "{{crmUrl}}/health" } }
+      ]
+    },
+    {
+      "name": "Leads",
+      "item": [
+        {
+          "name": "Create lead (website contact)",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/contact",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Test Buyer\",\n  \"email\": \"buyer@example.com\",\n  \"company\": \"Acme Retail\",\n  \"topic\": \"quotation\",\n  \"category\": \"food-packaging\",\n  \"message\": \"Quotation for 50,000 coffee cups to Nairobi.\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Create lead (CRM direct)",
+          "request": {
+            "method": "POST",
+            "url": "{{crmUrl}}/api/v1/leads",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"WhatsApp Lead\",\n  \"email\": \"wa@example.com\",\n  \"message\": \"QUOTE F01 50000\",\n  \"source\": \"whatsapp\"\n}"
+            }
+          }
+        },
+        {
+          "name": "List leads",
+          "request": {
+            "method": "GET",
+            "url": "{{crmUrl}}/api/v1/leads",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Chat",
+      "item": [
+        {
+          "name": "Ask the assistant",
+          "request": {
+            "method": "POST",
+            "url": "{{chatUrl}}/api/v1/chat",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"messages\": [\n    { \"role\": \"user\", \"content\": \"Do you make compostable coffee cups?\" }\n  ]\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Sustainability",
+      "item": [
+        {
+          "name": "Live ESG snapshot",
+          "request": {
+            "method": "GET",
+            "url": "{{sustainabilityUrl}}/api/v1/sustainability/snapshot"
+          }
+        }
+      ]
+    }
+  ]
+}

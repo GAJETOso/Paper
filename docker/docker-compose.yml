@@ -1,0 +1,74 @@
+# Local development stack: database, cache, search + the platform apps.
+# Usage: docker compose -f docker/docker-compose.yml up -d postgres redis
+name: sylvara-dev
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: sylvara
+      POSTGRES_PASSWORD: sylvara
+      POSTGRES_DB: sylvara
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sylvara"]
+      interval: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      retries: 10
+
+  meilisearch:
+    image: getmeili/meilisearch:v1.11
+    ports:
+      - "7700:7700"
+    environment:
+      MEILI_NO_ANALYTICS: "true"
+    volumes:
+      - meilidata:/meili_data
+
+  website:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: postgresql://sylvara:sylvara@postgres:5432/sylvara
+      CRM_URL: http://crm:4400
+    depends_on:
+      postgres:
+        condition: service_healthy
+    profiles: [full]
+
+  crm:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.service
+      args: { APP: service-crm }
+    ports:
+      - "4400:4400"
+    profiles: [full]
+
+  whatsapp-bot:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.service
+      args: { APP: whatsapp-bot }
+    ports:
+      - "4100:4100"
+    env_file: [../.env]
+    profiles: [full]
+
+volumes:
+  pgdata:
+  meilidata:
