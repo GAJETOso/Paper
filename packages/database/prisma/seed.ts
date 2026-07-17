@@ -4,9 +4,11 @@
  *
  * Run: pnpm --filter @sylvara/database seed
  */
+import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "@prisma/client";
 
-const prisma = new PrismaClient();
+const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
+const prisma = new PrismaClient({ adapter });
 
 // Catalog seed mirrors apps/website/src/data/products.ts (source of truth for
 // marketing copy); in production the website reads from this database instead.
