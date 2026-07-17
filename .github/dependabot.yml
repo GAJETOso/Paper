@@ -8,6 +8,13 @@ updates:
     groups:
       minor-and-patch:
         update-types: ["minor", "patch"]
+    ignore:
+      # eslint-config-next@15.5.20 (current Next.js major) only supports
+      # eslint ^7 || ^8 || ^9 — a 10.x bump breaks `next lint` at runtime
+      # (@rushstack/eslint-patch fails to patch ESLint's module resolution).
+      # Revisit once eslint-config-next ships ESLint 10 support.
+      - dependency-name: eslint
+        update-types: ["version-update:semver-major"]
     open-pull-requests-limit: 10
     labels: [dependencies]
     commit-message:
