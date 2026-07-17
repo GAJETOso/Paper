@@ -3,7 +3,7 @@
 # Bots/services use docker/Dockerfile.service with --build-arg APP=<name>.
 # ============================================================================
 
-FROM node:22-alpine AS deps
+FROM node:26-alpine AS deps
 RUN corepack enable
 WORKDIR /repo
 COPY pnpm-workspace.yaml package.json pnpm-lock.yaml tsconfig.base.json ./
@@ -16,7 +16,7 @@ FROM deps AS build
 WORKDIR /repo
 RUN pnpm --filter @sylvara/website build
 
-FROM node:22-alpine AS runtime
+FROM node:26-alpine AS runtime
 ENV NODE_ENV=production PORT=3000
 RUN addgroup -S app && adduser -S app -G app
 WORKDIR /app
