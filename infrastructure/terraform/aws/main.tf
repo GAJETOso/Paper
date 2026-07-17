@@ -36,7 +36,7 @@ variable "db_password" {
 
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
-  version = "~> 5.13"
+  version = "~> 6.6"
 
   name            = "sylvara-${var.environment}"
   cidr            = "10.40.0.0/16"
@@ -50,7 +50,7 @@ module "vpc" {
 
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
-  version = "~> 20.24"
+  version = "~> 21.24"
 
   cluster_name    = "sylvara-${var.environment}"
   cluster_version = "1.31"
