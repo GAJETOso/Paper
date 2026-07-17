@@ -33,7 +33,7 @@ jobs:
       # Requires the "Dependency graph" repository setting to be enabled
       # (Settings → Code security → Dependency graph). Non-blocking until
       # that's turned on so it doesn't fail PRs for an infra prerequisite.
-      - uses: actions/dependency-review-action@v4
+      - uses: actions/dependency-review-action@v5
         continue-on-error: true
         with:
           fail-on-severity: high
