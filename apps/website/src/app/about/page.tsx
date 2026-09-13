@@ -22,6 +22,18 @@ export default function AboutPage() {
         crumbs={[{ label: "About" }]}
       />
 
+      {/* Purpose */}
+      <section id="purpose" className="container-site scroll-mt-24 pt-20">
+        <Reveal>
+          <p className="eyebrow mx-auto block w-fit">Our purpose</p>
+          <p className="mx-auto mt-4 max-w-3xl text-center text-xl font-medium leading-relaxed text-ink-800 dark:text-ink-100 sm:text-2xl">
+            We exist to prove that industrial-scale manufacturing and planetary stewardship
+            aren&apos;t in conflict — that the world can have all the paper, packaging, and tissue
+            it needs without costing a single ancient forest.
+          </p>
+        </Reveal>
+      </section>
+
       {/* Mission & Vision */}
       <section id="mission" className="container-site scroll-mt-24 py-20">
         <div className="grid gap-6 md:grid-cols-2">
