@@ -1,6 +1,7 @@
 # Development image: full toolchain, hot reload, mounted source.
-FROM node:22-alpine
-RUN corepack enable && apk add --no-cache git
+FROM node:26-alpine
+# Node 26's alpine image no longer bundles corepack; install pnpm directly.
+RUN npm install -g pnpm@10.33.0 && apk add --no-cache git
 WORKDIR /repo
 EXPOSE 3000 4100 4200 4300 4400 4430
 CMD ["sh", "-c", "pnpm install && pnpm dev"]

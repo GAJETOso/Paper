@@ -15,6 +15,13 @@ updates:
       # Revisit once eslint-config-next ships ESLint 10 support.
       - dependency-name: eslint
         update-types: ["version-update:semver-major"]
+      # TypeScript 7 changes internal compiler module structure that
+      # @typescript-eslint/typescript-estree@8.63.0 (pulled in transitively
+      # via eslint-config-next) reads directly — parsing fails outright
+      # ("Cannot read properties of undefined (reading 'Cjs')"). No
+      # compatible @typescript-eslint release exists yet. Revisit once it does.
+      - dependency-name: typescript
+        update-types: ["version-update:semver-major"]
     open-pull-requests-limit: 10
     labels: [dependencies]
     commit-message:

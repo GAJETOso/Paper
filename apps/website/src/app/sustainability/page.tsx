@@ -65,6 +65,38 @@ export default function SustainabilityPage() {
         </div>
       </section>
 
+      {/* Policies */}
+      <section id="policies" className="container-site scroll-mt-24 py-20">
+        <SectionHeading eyebrow="Our policies" title="Formal commitments, board-approved" />
+        <div className="mt-12 grid gap-6 md:grid-cols-2">
+          <Reveal>
+            <div className="card h-full">
+              <p className="eyebrow">Environmental Policy</p>
+              <p className="prose-muted mt-4 text-sm leading-relaxed sm:text-base">
+                We source 100% of virgin fiber from FSC/PEFC-certified, zero-deforestation forests;
+                pursue net-zero greenhouse gas emissions across Scopes 1–3 by 2040 on an
+                SBTi-validated pathway; return process water to source quality or better; and drive
+                process waste to landfill toward zero. This policy binds every Sylvara mill,
+                subsidiary, and joint venture, and is reviewed annually by the Board Sustainability
+                Committee.
+              </p>
+            </div>
+          </Reveal>
+          <Reveal delay={120}>
+            <div className="card h-full">
+              <p className="eyebrow">Health &amp; Safety Policy</p>
+              <p className="prose-muted mt-4 text-sm leading-relaxed sm:text-base">
+                The safety of everyone who works at, visits, or is affected by our operations is
+                non-negotiable. We run ISO 45001-certified management systems at every site, target
+                Zero Harm, and guarantee any employee the right to stop work they believe is unsafe
+                without fear of reprisal. This commitment extends to every contractor and visitor.
+                Signed by the CEO and COO; reviewed annually.
+              </p>
+            </div>
+          </Reveal>
+        </div>
+      </section>
+
       {/* Six pillars */}
       <section id="circular" className="container-site scroll-mt-24 py-20">
         <SectionHeading eyebrow="Six pillars" title="How sustainability is organized" />
